@@ -8,18 +8,15 @@
     "start": "node dist/dev-server.js"
   },
   "dependencies": {
-    "@getbrevo/brevo": "^2.3.0",
-    "@types/mongoose": "^5.11.96",
-    "@vercel/node": "^5.3.26",
-    "bcryptjs": "^2.4.3",
-    "cookie-parser": "^1.4.6",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
+    "serverless-http": "^3.2.0",
     "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.5.1",
-    "nodemailer": "^7.0.9",
-    "serverless-http": "^3.2.0"
+    "cors": "^2.8.5",
+    "cookie-parser": "^1.4.6",
+    "mongoose": "^8.x",
+    "jsonwebtoken": "^9.x",
+    "bcryptjs": "^2.4.3",
+    "@getbrevo/brevo": "^2.x",
+    "debug": "^4.3.6"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
