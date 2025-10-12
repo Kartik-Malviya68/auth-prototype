@@ -1,3 +1,67 @@
+# -------------------------
+# Node / Package managers
+# -------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json.*   # lockfile backups only (keeps main lockfile)
+
+# -------------------------
+# TypeScript / Builds
+# -------------------------
+dist/
+*.tsbuildinfo
+
+# -------------------------
+# Env files (keep ONLY .env.example)
+# -------------------------
 .env
-node_modules
-package-lock.json
+.env.*
+!.env.example
+
+# -------------------------
+# Logs / PIDs
+# -------------------------
+logs/
+*.log
+*.log.*
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# -------------------------
+# Coverage / Testing
+# -------------------------
+coverage/
+.nyc_output/
+
+# -------------------------
+# Caches
+# -------------------------
+.cache/
+.eslintcache
+.parcel-cache/
+.next/
+.vercel/           # local vercel project data
+
+# -------------------------
+# Editors / OS junk
+# -------------------------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# Misc
+# -------------------------
+tmp/
+temp/
+*.swp
+*.swo
