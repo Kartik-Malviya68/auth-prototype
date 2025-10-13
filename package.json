@@ -2,9 +2,8 @@
   "name": "bravo-auth-backend",
   "private": true,
   "type": "module",
-  "scripts": {
-    "build": "webpack --config webpack.config.mjs", 
-    "dev": "vercel dev"
+"scripts": {
+    "dev:node": "ts-node --transpile-only src/dev-server.ts"
   },
   "dependencies": {
     "@getbrevo/brevo": "^2.x",

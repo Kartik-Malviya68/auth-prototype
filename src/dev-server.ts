@@ -1,10 +1,8 @@
-import app from "./app";
-import { connectMongoCached } from "./config/mongo";
+import app from './app';
 
-const port = Number(process.env.PORT || 4000);
+// pick any port (not 3000 if you also run vercel dev)
+const PORT = Number(process.env.PORT ?? 4000);
 
-async function main() {
-  await connectMongoCached();
-  app.listen(port, () => console.log(`🚀 auth server on :${port}`));
-}
-main().catch((e) => { console.error(e); process.exit(1); });
+app.listen(PORT, () => {
+  console.log(`Dev server running on http://localhost:${PORT}`);
+});
