@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+import { createRequire } from "node:module";
+const req = createRequire(import.meta.url);
+
+// Load .env only for local/dev. On Vercel, envs come from dashboard.
 if (!process.env.VERCEL && process.env.NODE_ENV !== "production") {
-  try {
-    require("dotenv").config();
-  } catch {}
+  try { req("dotenv").config(); } catch {}
 }
 
 export const env = {

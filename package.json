@@ -3,9 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/dev-server.ts",
-    "build": "webpack --config webpack.config.mjs",
-    "start": "node dist/dev-server.js"
+    "build": "webpack --config webpack.config.mjs", 
+    "dev": "vercel dev"
   },
   "dependencies": {
     "@getbrevo/brevo": "^2.x",

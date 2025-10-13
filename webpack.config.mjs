@@ -1,4 +1,3 @@
-// webpack.config.mjs
 import path from 'node:path';
 import nodeExternals from 'webpack-node-externals';
 
