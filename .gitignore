@@ -8,6 +8,8 @@ yarn-error.log*
 pnpm-debug.log*
 package-lock.json.*   # lockfile backups only (keeps main lockfile)
 
+
+api*
 # -------------------------
 # TypeScript / Builds
 # -------------------------
