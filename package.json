@@ -2,9 +2,6 @@
   "name": "bravo-auth-backend",
   "private": true,
   "type": "module",
-"scripts": {
-    "dev:node": "ts-node --transpile-only src/dev-server.ts"
-  },
   "dependencies": {
     "@getbrevo/brevo": "^2.x",
     "bcryptjs": "^2.4.3",
