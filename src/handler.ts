@@ -1,6 +1,3 @@
-// safest for Vercel
-import serverless from 'serverless-http';
-import app from './app';
-
-const handler = serverless(app);
-export default handler;
+import serverless from 'serverless-http'
+import app from './app'
+export default serverless(app)                 // ESM default export

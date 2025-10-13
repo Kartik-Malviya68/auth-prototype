@@ -1,19 +1,22 @@
-// ESM example
-import path from 'node:path';
-import nodeExternals from 'webpack-node-externals';
+import path from 'node:path'
+import nodeExternals from 'webpack-node-externals'
 
 export default {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   target: 'node',
   entry: './src/handler.ts',
+  experiments: { outputModule: true },        // 👈 enable ESM output
   output: {
     path: path.resolve(process.cwd(), 'api'),
     filename: 'index.js',
-    libraryTarget: 'commonjs2',
+    library: { type: 'module' },              // 👈 ESM library
+    module: true,                             // 👈 mark output as ESM
     clean: true,
   },
   resolve: { extensions: ['.ts', '.js'] },
   externalsPresets: { node: true },
-  externals: [nodeExternals()],
-  module: { rules: [{ test: /\.ts$/, use: 'ts-loader', exclude: /node_modules/ }] },
-};
+  externals: [nodeExternals()],               // keep node_modules external
+  module: {
+    rules: [{ test: /\.ts$/, use: 'ts-loader', exclude: /node_modules/ }],
+  },
+}

@@ -6,9 +6,7 @@
  * or disable the default devtool with "devtool: false".
  * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
  */
-/******/ (() => { // webpackBootstrap
-/******/ 	"use strict";
-/******/ 	var __webpack_modules__ = ({
+/******/ var __webpack_modules__ = ({
 
 /***/ "./src/app.ts":
 /*!********************!*\
@@ -56,7 +54,7 @@ eval("{\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nexp
   \************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-eval("{\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\n// safest for Vercel\nconst serverless_http_1 = __importDefault(__webpack_require__(/*! serverless-http */ \"serverless-http\"));\nconst app_1 = __importDefault(__webpack_require__(/*! ./app */ \"./src/app.ts\"));\nconst handler = (0, serverless_http_1.default)(app_1.default);\nexports[\"default\"] = handler;\n\n\n//# sourceURL=webpack://bravo-auth-backend/./src/handler.ts?\n}");
+eval("{\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst serverless_http_1 = __importDefault(__webpack_require__(/*! serverless-http */ \"serverless-http\"));\nconst app_1 = __importDefault(__webpack_require__(/*! ./app */ \"./src/app.ts\"));\nexports[\"default\"] = (0, serverless_http_1.default)(app_1.default); // ESM default export\n\n\n//# sourceURL=webpack://bravo-auth-backend/./src/handler.ts?\n}");
 
 /***/ }),
 
@@ -230,39 +228,37 @@ module.exports = require("serverless-http");
 
 /***/ })
 
-/******/ 	});
+/******/ });
 /************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
+/******/ // The module cache
+/******/ var __webpack_module_cache__ = {};
+/******/ 
+/******/ // The require function
+/******/ function __webpack_require__(moduleId) {
+/******/ 	// Check if module is in cache
+/******/ 	var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 	if (cachedModule !== undefined) {
+/******/ 		return cachedModule.exports;
 /******/ 	}
-/******/ 	
+/******/ 	// Create a new module (and put it into the cache)
+/******/ 	var module = __webpack_module_cache__[moduleId] = {
+/******/ 		// no module.id needed
+/******/ 		// no module.loaded needed
+/******/ 		exports: {}
+/******/ 	};
+/******/ 
+/******/ 	// Execute the module function
+/******/ 	__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 
+/******/ 	// Return the exports of the module
+/******/ 	return module.exports;
+/******/ }
+/******/ 
 /************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./src/handler.ts");
-/******/ 	module.exports = __webpack_exports__;
-/******/ 	
-/******/ })()
-;
+/******/ 
+/******/ // startup
+/******/ // Load entry module and return exports
+/******/ // This entry module is referenced by other modules so it can't be inlined
+/******/ var __webpack_exports__ = __webpack_require__("./src/handler.ts");
+/******/ export { __webpack_exports__ as default };
+/******/ 
