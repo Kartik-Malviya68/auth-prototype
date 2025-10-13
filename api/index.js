@@ -16,7 +16,7 @@
   \********************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-eval("{\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst express_1 = __importDefault(__webpack_require__(/*! express */ \"express\"));\nconst cors_1 = __importDefault(__webpack_require__(/*! cors */ \"cors\"));\nconst cookie_parser_1 = __importDefault(__webpack_require__(/*! cookie-parser */ \"cookie-parser\"));\nconst env_1 = __webpack_require__(/*! ./config/env */ \"./src/config/env.ts\");\nconst auth_route_1 = __importDefault(__webpack_require__(/*! ./routes/auth.route */ \"./src/routes/auth.route.ts\"));\nconst mongo_1 = __webpack_require__(/*! ./config/mongo */ \"./src/config/mongo.ts\");\nconst app = (0, express_1.default)();\napp.use((0, cors_1.default)({ origin: env_1.env.FRONTEND_URL, credentials: true }));\napp.use(express_1.default.json());\napp.use((0, cookie_parser_1.default)());\napp.get(\"/\", (_req, res) => res.json({ ok: true, service: \"auth\" }));\napp.get(\"/health\", (_req, res) => res.json({ ok: true }));\napp.use(\"/auth\", async (_req, res, next) => {\n    try {\n        await (0, mongo_1.connectMongoCached)();\n        next();\n    }\n    catch (e) {\n        console.error(\"Mongo connect failed:\", e);\n        res.status(500).json({ error: \"DB connection failed\" });\n    }\n});\napp.use(\"/auth\", auth_route_1.default);\nexports[\"default\"] = app; // <— IMPORTANT: no app.listen()\n\n\n//# sourceURL=webpack://bravo-auth-backend/./src/app.ts?\n}");
+eval("{\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst express_1 = __importDefault(__webpack_require__(/*! express */ \"express\"));\nconst cors_1 = __importDefault(__webpack_require__(/*! cors */ \"cors\"));\nconst cookie_parser_1 = __importDefault(__webpack_require__(/*! cookie-parser */ \"cookie-parser\"));\nconst env_1 = __webpack_require__(/*! ./config/env */ \"./src/config/env.ts\");\nconst auth_route_1 = __importDefault(__webpack_require__(/*! ./routes/auth.route */ \"./src/routes/auth.route.ts\"));\nconst mongo_1 = __webpack_require__(/*! ./config/mongo */ \"./src/config/mongo.ts\");\nconst app = (0, express_1.default)();\napp.use((0, cors_1.default)({ origin: env_1.env.FRONTEND_URL, credentials: true }));\napp.use(express_1.default.json());\napp.use((0, cookie_parser_1.default)());\napp.get(\"/\", (_req, res) => res.json({ ok: true, service: \"auth\" }));\napp.get('/auth/health', (_req, res) => res.json({ ok: true, db: 'connected' }));\napp.use(\"/auth\", async (_req, res, next) => {\n    try {\n        await (0, mongo_1.connectMongoCached)();\n        next();\n    }\n    catch (e) {\n        console.error(\"Mongo connect failed:\", e);\n        res.status(500).json({ error: \"DB connection failed\" });\n    }\n});\napp.use((err, _req, res, _next) => {\n    console.error('UNCAUGHT ERROR:', err);\n    res.status(500).json({ error: 'Internal error', detail: String(err?.message || err) });\n});\napp.use(\"/auth\", auth_route_1.default);\nexports[\"default\"] = app; // <— IMPORTANT: no app.listen()\n\n\n//# sourceURL=webpack://bravo-auth-backend/./src/app.ts?\n}");
 
 /***/ }),
 
@@ -26,7 +26,7 @@ eval("{\nvar __importDefault = (this && this.__importDefault) || function (mod) 
   \***************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-eval("{\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nexports.env = void 0;\nconst node_module_1 = __webpack_require__(/*! node:module */ \"node:module\");\nconst req = (0, node_module_1.createRequire)(\"file:///D:/Github/auth-prototype/src/config/env.ts\");\n// Load .env only for local/dev. On Vercel, envs come from dashboard.\nif (!process.env.VERCEL && \"development\" !== \"production\") {\n    try {\n        req(\"dotenv\").config();\n    }\n    catch { }\n}\nexports.env = {\n    NODE_ENV: \"development\" ?? 0,\n    PORT: Number(process.env.PORT ?? 4000),\n    FRONTEND_URL: process.env.FRONTEND_URL ?? \"http://localhost:3000\",\n    MONGO_URI: process.env.MONGO_URI ?? \"\",\n    JWT_SECRET: process.env.JWT_SECRET ?? \"\",\n    COOKIE_NAME: process.env.COOKIE_NAME ?? \"bravo_token\",\n    COOKIE_MAX_AGE: Number(process.env.COOKIE_MAX_AGE ?? 2592000),\n    COOKIE_DOMAIN: process.env.COOKIE_DOMAIN ?? \"\",\n    BREVO: {\n        API_KEY: process.env.BREVO_API_KEY ?? \"\",\n        FROM_EMAIL: process.env.BREVO_FROM_EMAIL ?? \"no-reply@example.com\",\n        FROM_NAME: process.env.BREVO_FROM_NAME ?? \"Bravo\",\n    },\n};\n\n\n//# sourceURL=webpack://bravo-auth-backend/./src/config/env.ts?\n}");
+eval("{\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nexports.env = void 0;\n// Load .env only locally. On Vercel, values come from dashboard.\nif (!process.env.VERCEL && \"development\" !== 'production') {\n    try {\n        (__webpack_require__(/*! dotenv */ \"dotenv\").config)();\n    }\n    catch { }\n}\nexports.env = {\n    NODE_ENV: \"development\" ?? 0,\n    FRONTEND_URL: process.env.FRONTEND_URL ?? 'http://localhost:3000',\n    MONGO_URI: process.env.MONGO_URI ?? '',\n    JWT_SECRET: process.env.JWT_SECRET ?? '',\n    COOKIE_NAME: process.env.COOKIE_NAME ?? 'bravo_token',\n    COOKIE_MAX_AGE: Number(process.env.COOKIE_MAX_AGE ?? 2592000),\n    COOKIE_DOMAIN: process.env.COOKIE_DOMAIN ?? '',\n    BREVO: {\n        API_KEY: process.env.BREVO_API_KEY ?? '',\n        FROM_EMAIL: process.env.BREVO_FROM_EMAIL ?? 'no-reply@example.com',\n        FROM_NAME: process.env.BREVO_FROM_NAME ?? 'Bravo',\n    },\n};\n\n\n//# sourceURL=webpack://bravo-auth-backend/./src/config/env.ts?\n}");
 
 /***/ }),
 
@@ -56,7 +56,7 @@ eval("{\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nexp
   \************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-eval("{\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst app_1 = __importDefault(__webpack_require__(/*! ./app */ \"./src/app.ts\"));\nexports[\"default\"] = app_1.default; // works on Vercel Node runtime\n// If you prefer serverless-http:\n// import serverless from 'serverless-http';\n// export default serverless(app);\n\n\n//# sourceURL=webpack://bravo-auth-backend/./src/handler.ts?\n}");
+eval("{\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\n// safest for Vercel\nconst serverless_http_1 = __importDefault(__webpack_require__(/*! serverless-http */ \"serverless-http\"));\nconst app_1 = __importDefault(__webpack_require__(/*! ./app */ \"./src/app.ts\"));\nconst handler = (0, serverless_http_1.default)(app_1.default);\nexports[\"default\"] = handler;\n\n\n//# sourceURL=webpack://bravo-auth-backend/./src/handler.ts?\n}");
 
 /***/ }),
 
@@ -180,6 +180,16 @@ module.exports = require("cors");
 
 /***/ }),
 
+/***/ "dotenv":
+/*!*************************!*\
+  !*** external "dotenv" ***!
+  \*************************/
+/***/ ((module) => {
+
+module.exports = require("dotenv");
+
+/***/ }),
+
 /***/ "express":
 /*!**************************!*\
   !*** external "express" ***!
@@ -210,13 +220,13 @@ module.exports = require("mongoose");
 
 /***/ }),
 
-/***/ "node:module":
-/*!******************************!*\
-  !*** external "node:module" ***!
-  \******************************/
+/***/ "serverless-http":
+/*!**********************************!*\
+  !*** external "serverless-http" ***!
+  \**********************************/
 /***/ ((module) => {
 
-module.exports = require("node:module");
+module.exports = require("serverless-http");
 
 /***/ })
 

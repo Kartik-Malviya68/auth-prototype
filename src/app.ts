@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.get("/", (_req, res) => res.json({ ok: true, service: "auth" }));
-app.get("/health", (_req, res) => res.json({ ok: true }));
+app.get('/auth/health', (_req, res) => res.json({ ok: true, db: 'connected' }));
 
 app.use("/auth", async (_req, res, next) => {
   try {
@@ -22,6 +22,11 @@ app.use("/auth", async (_req, res, next) => {
     console.error("Mongo connect failed:", e);
     res.status(500).json({ error: "DB connection failed" });
   }
+});
+
+app.use((err: any, _req: any, res: any, _next: any) => {
+  console.error('UNCAUGHT ERROR:', err);
+  res.status(500).json({ error: 'Internal error', detail: String(err?.message || err) });
 });
 
 app.use("/auth", authRoutes);
