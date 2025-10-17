@@ -1,22 +1,47 @@
-import path from 'node:path'
-import nodeExternals from 'webpack-node-externals'
+// webpack.config.mjs
+import path from "path";
+import { fileURLToPath } from "url";
+import nodeExternals from "webpack-node-externals";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default {
-  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
-  target: 'node',
-  entry: './src/handler.ts',
-  experiments: { outputModule: true },        // 👈 enable ESM output
+  mode: process.env.NODE_ENV === "production" ? "production" : "development",
+  target: "node",
+  entry: path.resolve(__dirname, "src/index.ts"),
   output: {
-    path: path.resolve(process.cwd(), 'api'),
-    filename: 'index.js',
-    library: { type: 'module' },              // 👈 ESM library
-    module: true,                             // 👈 mark output as ESM
-    clean: true,
+    path: path.resolve(__dirname, "api"),
+    filename: "index.js",
+    library: { type: "module" }, // ESM
+    module: true,
+    clean: true
   },
-  resolve: { extensions: ['.ts', '.js'] },
+  experiments: { outputModule: true },
   externalsPresets: { node: true },
-  externals: [nodeExternals()],               // keep node_modules external
-  module: {
-    rules: [{ test: /\.ts$/, use: 'ts-loader', exclude: /node_modules/ }],
+
+  // 🔑 Externalize node_modules as ESM imports (no allowlist)
+  externalsType: "module",
+  externals: [nodeExternals({ importType: "module" })],
+
+  devtool: process.env.NODE_ENV === "production" ? false : "source-map",
+  resolve: {
+    extensions: [".ts", ".js", ".mjs", ".cjs"],
+    extensionAlias: {
+      ".js": [".ts", ".js"],
+      ".mjs": [".mts", ".mjs"],
+      ".cjs": [".cts", ".cjs"]
+    }
   },
-}
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        use: [{ loader: "ts-loader", options: { transpileOnly: true } }],
+        exclude: /node_modules/
+      }
+    ]
+  },
+  optimization: { minimize: false },
+  stats: { errorDetails: true }
+};

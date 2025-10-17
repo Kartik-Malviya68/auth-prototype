@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import { Otp } from "../models/Otp";
-import { generateOtp, hashOtp, verifyOtpHash, minutesFromNow } from "../lib/otp";
+import { generateOtp, hashOtp, minutesFromNow, verifyOtpHash } from "../lib/otp";
 import { sendOtpEmail } from "../lib/mailer";
-import { env } from "../config/env";
 import { User } from "../models/User";
 import { signJwt, verifyJwt } from "../lib/jwt";
 import { clearAuthCookie, setAuthCookie } from "../lib/cookies";
+import { env } from "../config/env";
+
 
 /** Internal: create + email OTP */
 async function createAndSendOtp(email: string, purpose: "register" | "login") {

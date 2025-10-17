@@ -1,14 +1,7 @@
 import { Router } from "express";
-import {
-  registerRequestOtp,
-  registerVerifyOtp,
-  loginRequestOtp,
-  loginVerifyOtp,
-  session,
-  me,
-  logout,
-} from "../controllers/auth.controller";
-import { authMiddleware } from "../middlewares/auth";
+import { loginRequestOtp, loginVerifyOtp, logout, me, registerRequestOtp, registerVerifyOtp, session } from "../controllers/auth.controller";
+import { authMiddleware } from "../middlewares/auth.js";
+
 
 const router = Router();
 
