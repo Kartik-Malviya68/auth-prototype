@@ -22,16 +22,16 @@ export function setAuthCookie(res: Response, token: string) {
   const apiHost = res.req?.headers?.host; // e.g. api.example.com or IP
   const crossSite = isCrossSite(apiHost, env.FRONTEND_URL);
 
-  res.cookie(env.COOKIE_NAME, token, {
-    httpOnly: true,
-    // In prod: Secure must be true. For local HTTP, allow turning it off with DEV_HTTP=1
-    secure: isProd && process.env.DEV_HTTP !== "1",
-    sameSite: crossSite ? "none" : "lax",
-    path: "/",
-    maxAge: env.COOKIE_MAX_AGE * 1000,
-    // IMPORTANT: omit domain when cross-site (host-only cookie is safest)
-    // ...(env.COOKIE_DOMAIN && !crossSite ? { domain: normalizeDomain(env.COOKIE_DOMAIN) } : {})
-  });
+  // cookie.ts (API) – Express 4.19+ / cookie@0.6+ supports this
+res.cookie(env.COOKIE_NAME, token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+  partitioned: true,     // <-- important
+  path: "/",
+  maxAge: env.COOKIE_MAX_AGE * 1000,
+});
+
 }
 
 export function clearAuthCookie(res: Response) {
