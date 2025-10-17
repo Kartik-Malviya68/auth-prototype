@@ -13,16 +13,21 @@ export default {
   output: {
     path: path.resolve(__dirname, "api"),
     filename: "index.js",
-    library: { type: "module" }, // ESM
+    library: { type: "module" },
     module: true,
-    clean: true
+    clean: true,
   },
   experiments: { outputModule: true },
   externalsPresets: { node: true },
 
-  // 🔑 Externalize node_modules as ESM imports (no allowlist)
+  // ⬇️ Bundle bcryptjs; leave the rest external as ESM imports
   externalsType: "module",
-  externals: [nodeExternals({ importType: "module", allowlist: [/^bcryptjs$/], })],
+  externals: [
+    nodeExternals({
+      importType: "module",
+      allowlist: [/^bcryptjs$/], // <— IMPORTANT
+    }),
+  ],
 
   devtool: process.env.NODE_ENV === "production" ? false : "source-map",
   resolve: {
@@ -30,18 +35,18 @@ export default {
     extensionAlias: {
       ".js": [".ts", ".js"],
       ".mjs": [".mts", ".mjs"],
-      ".cjs": [".cts", ".cjs"]
-    }
+      ".cjs": [".cts", ".cjs"],
+    },
   },
   module: {
     rules: [
       {
         test: /\.ts$/,
         use: [{ loader: "ts-loader", options: { transpileOnly: true } }],
-        exclude: /node_modules/
-      }
-    ]
+        exclude: /node_modules/,
+      },
+    ],
   },
   optimization: { minimize: false },
-  stats: { errorDetails: true }
+  stats: { errorDetails: true },
 };
