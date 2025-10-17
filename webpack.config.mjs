@@ -1,3 +1,4 @@
+// webpack.config.mjs
 import path from "path";
 import { fileURLToPath } from "url";
 import webpack from "webpack";
@@ -12,13 +13,13 @@ export default {
   output: {
     path: path.resolve(__dirname, "api"),
     filename: "index.js",
-    library: { type: "module" },
+    library: { type: "module" }, // ESM output
     module: true,
     clean: true,
   },
   experiments: { outputModule: true },
 
-  // ⛔️ NO externals — bundle everything so PM2 never touches node_modules at runtime
+  // Bundle everything so PM2 never touches node_modules at runtime
   devtool: process.env.NODE_ENV === "production" ? false : "source-map",
 
   resolve: {
@@ -33,20 +34,34 @@ export default {
         exclude: /node_modules/,
       },
     ],
+
+    // 👇 Extra safety: globally disable “expr context is critical” noise
+    parser: {
+      javascript: {
+        exprContextCritical: false,
+      },
+    },
   },
-  ignoreWarnings: [
-  /express[\\/]lib[\\/]view\.js.*Critical dependency/i,
-],
+
   plugins: [
-    // Silence optional Mongo deps that you don't use
+    // Silence optional MongoDB deps you don't use
     new webpack.IgnorePlugin({
       resourceRegExp:
         /^(gcp-metadata|snappy|socks|mongodb-client-encryption|kerberos|@mongodb-js\/zstd|@aws-sdk\/credential-providers)$/,
     }),
   ],
 
+  // 👇 Robust filter: hide ONLY the Express view.js warning (works on Windows paths)
   ignoreWarnings: [
-    /express[\\/]lib[\\/]view\.js.*Critical dependency/i,
+    (warning) => {
+      const msg = String(warning.message || "");
+      const res = String(warning.module?.resource || "");
+      const isCritical = msg.includes("Critical dependency");
+      const isExpressView =
+        /express[\\/]+lib[\\/]+view\.js$/i.test(res) ||
+        /node_modules[\\/]+express[\\/]+lib[\\/]+view\.js$/i.test(res);
+      return isCritical && isExpressView;
+    },
   ],
 
   optimization: { minimize: false },
