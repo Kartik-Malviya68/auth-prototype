@@ -22,7 +22,7 @@ export default {
 
   // 🔑 Externalize node_modules as ESM imports (no allowlist)
   externalsType: "module",
-  externals: [nodeExternals({ importType: "module" })],
+  externals: [nodeExternals({ importType: "module", allowlist: [/^bcryptjs$/], })],
 
   devtool: process.env.NODE_ENV === "production" ? false : "source-map",
   resolve: {
