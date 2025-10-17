@@ -13,33 +13,35 @@ export default {
   output: {
     path: path.resolve(__dirname, "api"),
     filename: "index.js",
-    library: { type: "module" },
+    library: { type: "module" }, // ESM
     module: true,
-    clean: true,
+    clean: true
   },
   experiments: { outputModule: true },
   externalsPresets: { node: true },
+
+  // 🔑 Externalize node_modules as ESM imports (no allowlist)
   externalsType: "module",
-  externals: [
-    nodeExternals({
-      importType: "module",
-      allowlist: [/^bcryptjs$/],      // ✅ bundle bcryptjs to avoid PM2/CJS issues
-    }),
-  ],
+  externals: [nodeExternals({ importType: "module" })],
+
   devtool: process.env.NODE_ENV === "production" ? false : "source-map",
   resolve: {
-    // No extensionAlias! It was breaking node_modules resolution.
     extensions: [".ts", ".js", ".mjs", ".cjs"],
+    extensionAlias: {
+      ".js": [".ts", ".js"],
+      ".mjs": [".mts", ".mjs"],
+      ".cjs": [".cts", ".cjs"]
+    }
   },
   module: {
     rules: [
       {
         test: /\.ts$/,
         use: [{ loader: "ts-loader", options: { transpileOnly: true } }],
-        exclude: /node_modules/,
-      },
-    ],
+        exclude: /node_modules/
+      }
+    ]
   },
   optimization: { minimize: false },
-  stats: { errorDetails: true },
+  stats: { errorDetails: true }
 };
