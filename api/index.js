@@ -235,23 +235,41 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _config_env__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config/env */ "./src/config/env.ts");
 
+/** Only return a safe cookie domain. Omit for localhost/IP/blank/underscore. */
+function sanitizeCookieDomain(raw) {
+    if (!raw)
+        return undefined;
+    const v = raw.trim();
+    if (!v || v === "_")
+        return undefined;
+    // don't set domain for localhost or IPs (host-only cookie is correct)
+    if (v === "localhost" || /^\d{1,3}(\.\d{1,3}){3}$/.test(v))
+        return undefined;
+    // must contain a dot to be a registrable domain
+    if (!v.includes("."))
+        return undefined;
+    // normalize to leading dot so it works across subdomains
+    return v.startsWith(".") ? v : `.${v}`;
+}
 function setAuthCookie(res, token) {
     const isProd = _config_env__WEBPACK_IMPORTED_MODULE_0__.env.NODE_ENV === "production";
+    const domain = sanitizeCookieDomain(_config_env__WEBPACK_IMPORTED_MODULE_0__.env.COOKIE_DOMAIN);
     res.cookie(_config_env__WEBPACK_IMPORTED_MODULE_0__.env.COOKIE_NAME, token, {
         httpOnly: true,
-        secure: isProd, // true on Vercel (HTTPS)
+        secure: isProd, // true in HTTPS
         sameSite: "lax",
         path: "/",
         maxAge: _config_env__WEBPACK_IMPORTED_MODULE_0__.env.COOKIE_MAX_AGE * 1000,
-        ...(_config_env__WEBPACK_IMPORTED_MODULE_0__.env.COOKIE_DOMAIN ? { domain: _config_env__WEBPACK_IMPORTED_MODULE_0__.env.COOKIE_DOMAIN } : {})
+        ...(domain ? { domain } : {})
     });
 }
 function clearAuthCookie(res) {
+    const domain = sanitizeCookieDomain(_config_env__WEBPACK_IMPORTED_MODULE_0__.env.COOKIE_DOMAIN);
     res.clearCookie(_config_env__WEBPACK_IMPORTED_MODULE_0__.env.COOKIE_NAME, {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        ...(_config_env__WEBPACK_IMPORTED_MODULE_0__.env.COOKIE_DOMAIN ? { domain: _config_env__WEBPACK_IMPORTED_MODULE_0__.env.COOKIE_DOMAIN } : {})
+        ...(domain ? { domain } : {})
     });
 }
 
@@ -300,23 +318,35 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _getbrevo_brevo__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @getbrevo/brevo */ "@getbrevo/brevo");
 /* harmony import */ var _config_env__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config/env */ "./src/config/env.ts");
-// src/utils/sendBrevoOtp.ts
+// src/lib/mailer.ts
 
 
+function normalizeSenderEmail(raw) {
+    if (!raw)
+        return raw;
+    const m = raw.match(/<([^>]+)>/); // "Name <you@x.com>" -> "you@x.com"
+    return (m ? m[1] : raw).trim();
+}
+function isEmail(v) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
 async function sendOtpEmail(to, code, purpose) {
     if (!_config_env__WEBPACK_IMPORTED_MODULE_1__.env.BREVO.API_KEY) {
         console.warn("⚠️ BREVO_API_KEY missing — DEV OTP:", code);
         return;
     }
-    // Brevo v2 SDK (CJS-style) exposes classes on the module namespace
+    const senderEmail = normalizeSenderEmail(_config_env__WEBPACK_IMPORTED_MODULE_1__.env.BREVO.FROM_EMAIL);
+    if (!senderEmail || !isEmail(senderEmail)) {
+        console.error("❌ BREVO_FROM_EMAIL invalid. Use a plain verified address like you@domain.com (no < >).");
+        return;
+    }
     const api = new _getbrevo_brevo__WEBPACK_IMPORTED_MODULE_0__.TransactionalEmailsApi();
-    // Support both auth styles used across v2.x releases:
     if (typeof api.setApiKey === "function") {
-        // Older v2 signature
+        // older v2 builds
         api.setApiKey(_getbrevo_brevo__WEBPACK_IMPORTED_MODULE_0__.TransactionalEmailsApiApiKeys.apiKey, _config_env__WEBPACK_IMPORTED_MODULE_1__.env.BREVO.API_KEY);
     }
     else if (api?.authentications?.apiKey) {
-        // Newer v2 signature
+        // newer v2 builds
         api.authentications.apiKey.apiKey = _config_env__WEBPACK_IMPORTED_MODULE_1__.env.BREVO.API_KEY;
     }
     else {
@@ -332,7 +362,8 @@ async function sendOtpEmail(to, code, purpose) {
     const email = new _getbrevo_brevo__WEBPACK_IMPORTED_MODULE_0__.SendSmtpEmail();
     email.subject = subject;
     email.htmlContent = html;
-    email.sender = { name: _config_env__WEBPACK_IMPORTED_MODULE_1__.env.BREVO.FROM_NAME, email: _config_env__WEBPACK_IMPORTED_MODULE_1__.env.BREVO.FROM_EMAIL }; // must be a verified sender
+    email.sender = { name: _config_env__WEBPACK_IMPORTED_MODULE_1__.env.BREVO.FROM_NAME, email: senderEmail }; // MUST be verified in Brevo
+    email.replyTo = { name: _config_env__WEBPACK_IMPORTED_MODULE_1__.env.BREVO.FROM_NAME, email: senderEmail };
     email.to = [{ email: to }];
     try {
         await api.sendTransacEmail(email);
