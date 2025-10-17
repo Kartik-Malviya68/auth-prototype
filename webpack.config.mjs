@@ -1,10 +1,25 @@
 // webpack.config.mjs
 import path from "path";
 import { fileURLToPath } from "url";
+import nodeExternals from "webpack-node-externals";
 import webpack from "webpack";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Build a base externals handler
+const baseExternals = nodeExternals({
+  importType: "module", // keep ESM externals for the rest
+});
+
+// Wrap it to ALWAYS bundle bcryptjs
+function externalsExceptBcryptjs(context, request, callback) {
+  // If the request is bcryptjs or any subpath, DO NOT externalize
+  if (/^bcryptjs(\/.*)?$/.test(request)) return callback(); // bundled
+
+  // Otherwise, delegate to nodeExternals (externalize)
+  return baseExternals(context, request, callback);
+}
 
 export default {
   mode: process.env.NODE_ENV === "production" ? "production" : "development",
@@ -13,13 +28,16 @@ export default {
   output: {
     path: path.resolve(__dirname, "api"),
     filename: "index.js",
-    library: { type: "module" }, // ESM output
+    library: { type: "module" },
     module: true,
     clean: true,
   },
   experiments: { outputModule: true },
 
-  // Bundle everything so PM2 never touches node_modules at runtime
+  externalsPresets: { node: true },
+  externalsType: "module",
+  externals: [externalsExceptBcryptjs], // 👈 use our wrapper
+
   devtool: process.env.NODE_ENV === "production" ? false : "source-map",
 
   resolve: {
@@ -34,35 +52,17 @@ export default {
         exclude: /node_modules/,
       },
     ],
-
-    // 👇 Extra safety: globally disable “expr context is critical” noise
-    parser: {
-      javascript: {
-        exprContextCritical: false,
-      },
-    },
+    parser: { javascript: { exprContextCritical: false } },
   },
 
   plugins: [
-    // Silence optional MongoDB deps you don't use
     new webpack.IgnorePlugin({
       resourceRegExp:
         /^(gcp-metadata|snappy|socks|mongodb-client-encryption|kerberos|@mongodb-js\/zstd|@aws-sdk\/credential-providers)$/,
     }),
   ],
 
-  // 👇 Robust filter: hide ONLY the Express view.js warning (works on Windows paths)
-  ignoreWarnings: [
-    (warning) => {
-      const msg = String(warning.message || "");
-      const res = String(warning.module?.resource || "");
-      const isCritical = msg.includes("Critical dependency");
-      const isExpressView =
-        /express[\\/]+lib[\\/]+view\.js$/i.test(res) ||
-        /node_modules[\\/]+express[\\/]+lib[\\/]+view\.js$/i.test(res);
-      return isCritical && isExpressView;
-    },
-  ],
+  ignoreWarnings: [/express[\\/]lib[\\/]view\.js.*Critical dependency/i],
 
   optimization: { minimize: false },
   stats: { errorDetails: true },
