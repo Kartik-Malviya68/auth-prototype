@@ -1,6 +1,16 @@
-// src/utils/sendBrevoOtp.ts
+// src/lib/mailer.ts
 import * as Brevo from "@getbrevo/brevo";
 import { env } from "../config/env";
+
+function normalizeSenderEmail(raw: string) {
+  if (!raw) return raw;
+  const m = raw.match(/<([^>]+)>/); // "Name <you@x.com>" -> "you@x.com"
+  return (m ? m[1] : raw).trim();
+}
+
+function isEmail(v: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
 
 export async function sendOtpEmail(
   to: string,
@@ -12,15 +22,20 @@ export async function sendOtpEmail(
     return;
   }
 
-  // Brevo v2 SDK (CJS-style) exposes classes on the module namespace
-  const api = new (Brevo as any).TransactionalEmailsApi();
+  const senderEmail = normalizeSenderEmail(env.BREVO.FROM_EMAIL);
+  if (!senderEmail || !isEmail(senderEmail)) {
+    console.error(
+      "❌ BREVO_FROM_EMAIL invalid. Use a plain verified address like you@domain.com (no < >)."
+    );
+    return;
+  }
 
-  // Support both auth styles used across v2.x releases:
+  const api = new (Brevo as any).TransactionalEmailsApi();
   if (typeof api.setApiKey === "function") {
-    // Older v2 signature
+    // older v2 builds
     api.setApiKey((Brevo as any).TransactionalEmailsApiApiKeys.apiKey, env.BREVO.API_KEY);
   } else if (api?.authentications?.apiKey) {
-    // Newer v2 signature
+    // newer v2 builds
     api.authentications.apiKey.apiKey = env.BREVO.API_KEY;
   } else {
     throw new Error("Brevo API key binding failed — SDK shape not recognized.");
@@ -37,7 +52,8 @@ export async function sendOtpEmail(
   const email = new (Brevo as any).SendSmtpEmail();
   email.subject = subject;
   email.htmlContent = html;
-  email.sender = { name: env.BREVO.FROM_NAME, email: env.BREVO.FROM_EMAIL }; // must be a verified sender
+  email.sender = { name: env.BREVO.FROM_NAME, email: senderEmail }; // MUST be verified in Brevo
+  email.replyTo = { name: env.BREVO.FROM_NAME, email: senderEmail };
   email.to = [{ email: to }];
 
   try {

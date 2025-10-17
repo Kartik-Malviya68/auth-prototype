@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "cross-env RUN_LOCAL=1 ts-node-dev --respawn --transpile-only src/index.ts",
+     "dev": "nodemon",
     "build": "webpack --config webpack.config.mjs",
     "start": "cross-env RUN_LOCAL=1 node api/index.js"
   },
@@ -28,7 +28,9 @@
     "@types/nodemailer": "^7.0.2",
     "cross-env": "^10.1.0",
     "dotenv": "^17.2.3",
+    "nodemon": "^3.1.10",
     "ts-loader": "^9",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3",
     "webpack": "^5",
