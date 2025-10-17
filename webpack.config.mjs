@@ -1,6 +1,5 @@
 import path from "path";
 import { fileURLToPath } from "url";
-import nodeExternals from "webpack-node-externals";
 import webpack from "webpack";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -8,7 +7,7 @@ const __dirname = path.dirname(__filename);
 
 export default {
   mode: process.env.NODE_ENV === "production" ? "production" : "development",
-  target: "node", // Important for backend builds
+  target: "node",
   entry: path.resolve(__dirname, "src/index.ts"),
   output: {
     path: path.resolve(__dirname, "api"),
@@ -19,19 +18,11 @@ export default {
   },
   experiments: { outputModule: true },
 
-  externalsPresets: { node: true },
-  externalsType: "module",
-  externals: [nodeExternals({ importType: "module" })],
-
+  // ⛔️ NO externals — bundle everything so PM2 never touches node_modules at runtime
   devtool: process.env.NODE_ENV === "production" ? false : "source-map",
 
   resolve: {
     extensions: [".ts", ".js", ".mjs", ".cjs"],
-    extensionAlias: {
-      ".js": [".ts", ".js"],
-      ".mjs": [".mts", ".mjs"],
-      ".cjs": [".cts", ".cjs"],
-    },
   },
 
   module: {
@@ -43,17 +34,18 @@ export default {
       },
     ],
   },
-
-  // 👇 Silence all the noisy MongoDB optional deps & Express warnings
+  ignoreWarnings: [
+  /express[\\/]lib[\\/]view\.js.*Critical dependency/i,
+],
   plugins: [
+    // Silence optional Mongo deps that you don't use
     new webpack.IgnorePlugin({
-      resourceRegExp: /^(gcp-metadata|snappy|socks|mongodb-client-encryption|kerberos|@mongodb-js\/zstd|@aws-sdk\/credential-providers)$/,
+      resourceRegExp:
+        /^(gcp-metadata|snappy|socks|mongodb-client-encryption|kerberos|@mongodb-js\/zstd|@aws-sdk\/credential-providers)$/,
     }),
   ],
 
-  // 👇 Replace deprecated stats.warningsFilter
   ignoreWarnings: [
-    // Express' dynamic require warning in view.js
     /express[\\/]lib[\\/]view\.js.*Critical dependency/i,
   ],
 
