@@ -5,25 +5,24 @@ import { env } from "../config/env";
 const IS_PROD = env.NODE_ENV === "production";
 const DEV_HTTP = process.env.DEV_HTTP === "1"; // allow insecure cookie locally
 
-export function setAuthCookie(res: Response, token: string) {
+// utils/cookie.ts
+export function setAuthCookie(res: Response, token: string, maxAgeSec: number) {
   res.cookie(env.COOKIE_NAME, token, {
     httpOnly: true,
-    secure: IS_PROD && !DEV_HTTP,         // true in prod (HTTPS)
-    sameSite: IS_PROD ? "none" : "lax",   // cross-site in prod
-    // Keep 3P cookie alive across reloads in Chromium (CHIPS)
-    ...(IS_PROD ? { partitioned: true as any } : {}),
+    secure: true,           // API is HTTPS in prod
+    sameSite: "none",       // cross-site from localhost
+    partitioned: true as any,
     path: "/",
-    maxAge: env.COOKIE_MAX_AGE * 1000,
-    // IMPORTANT: do NOT set `domain` for cross-site; host-only is correct
+    maxAge: maxAgeSec * 1000,
   });
 }
 
 export function clearAuthCookie(res: Response) {
   res.clearCookie(env.COOKIE_NAME, {
     httpOnly: true,
-    secure: IS_PROD && !DEV_HTTP,
-    sameSite: IS_PROD ? "none" : "lax",
-    ...(IS_PROD ? { partitioned: true as any } : {}),
+    secure: true,
+    sameSite: "none",
+    partitioned: true as any,
     path: "/",
   });
 }
