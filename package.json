@@ -5,7 +5,7 @@
   "scripts": {
      "dev": "nodemon",
     "build": "webpack --config webpack.config.mjs",
-    "start": "node api/index.js"
+    "start": "cross-env RUN_LOCAL=1 node api/index.js"
   },
   "dependencies": {
     "@getbrevo/brevo": "^2.x",
