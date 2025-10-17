@@ -19,24 +19,17 @@ export default {
   },
   experiments: { outputModule: true },
   externalsPresets: { node: true },
-
-  // ⬇️ Bundle bcryptjs; leave the rest external as ESM imports
   externalsType: "module",
   externals: [
     nodeExternals({
       importType: "module",
-      allowlist: [/^bcryptjs$/], // <— IMPORTANT
+      allowlist: [/^bcryptjs$/],      // ✅ bundle bcryptjs to avoid PM2/CJS issues
     }),
   ],
-
   devtool: process.env.NODE_ENV === "production" ? false : "source-map",
   resolve: {
+    // No extensionAlias! It was breaking node_modules resolution.
     extensions: [".ts", ".js", ".mjs", ".cjs"],
-    extensionAlias: {
-      ".js": [".ts", ".js"],
-      ".mjs": [".mts", ".mjs"],
-      ".cjs": [".cts", ".cjs"],
-    },
   },
   module: {
     rules: [
