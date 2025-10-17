@@ -504,7 +504,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! express */ "express");
 /* harmony import */ var _controllers_auth_controller__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../controllers/auth.controller */ "./src/controllers/auth.controller.ts");
-/* harmony import */ var _middlewares_auth_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../middlewares/auth.js */ "./src/middlewares/auth.ts");
+/* harmony import */ var _middlewares_auth__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../middlewares/auth */ "./src/middlewares/auth.ts");
 
 
 
@@ -514,7 +514,7 @@ router.post("/register/verify-otp", _controllers_auth_controller__WEBPACK_IMPORT
 router.post("/login/request-otp", _controllers_auth_controller__WEBPACK_IMPORTED_MODULE_1__.loginRequestOtp);
 router.post("/login/verify-otp", _controllers_auth_controller__WEBPACK_IMPORTED_MODULE_1__.loginVerifyOtp);
 router.get("/session", _controllers_auth_controller__WEBPACK_IMPORTED_MODULE_1__.session);
-router.get("/me", _middlewares_auth_js__WEBPACK_IMPORTED_MODULE_2__.authMiddleware, _controllers_auth_controller__WEBPACK_IMPORTED_MODULE_1__.me);
+router.get("/me", _middlewares_auth__WEBPACK_IMPORTED_MODULE_2__.authMiddleware, _controllers_auth_controller__WEBPACK_IMPORTED_MODULE_1__.me);
 router.post("/logout", _controllers_auth_controller__WEBPACK_IMPORTED_MODULE_1__.logout);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (router); // ✅
 
